@@ -1,6 +1,6 @@
 IMAGE_NAME=text-extract-app
 CONTAINER_NAME=text-extract-container
-PORT=8000
+PORT=8001
 
 VENV_DIR=venv
 

@@ -4,8 +4,8 @@ This application is built using FastAPI to extract text from PDF and DOCX files.
 
 ## Features
 
-- Extract text from PDF files using PyPDF2.
-- Extract text from DOCX files using python-docx.
+- Extract text from documents.
+- Supported file types include PDF, DOCX, PPTX, TXT, HTML, and RTF.
 - Easy deployment with Docker.
 - Auto-generated documentation with Swagger UI.
 
@@ -41,9 +41,9 @@ This application is built using FastAPI to extract text from PDF and DOCX files.
    make run-local
    ```
 
-   This will start the Uvicorn server with live reload enabled on `http://localhost:8000`.
+   This will start the Uvicorn server with live reload enabled on `http://localhost:8001`.
 
-   Visit `http://localhost:8000/docs` in your web browser to access the Swagger UI and interact with the API.
+   Visit `http://localhost:8001/docs` in your web browser to access the Swagger UI and interact with the API.
 
 ## Docker Setup
 
@@ -63,7 +63,7 @@ This application is built using FastAPI to extract text from PDF and DOCX files.
    make run
    ```
 
-   The application will be available at `http://localhost:8000`.
+   The application will be available at `http://localhost:8001`.
 
    To stop the container, use:
 
@@ -76,7 +76,7 @@ This application is built using FastAPI to extract text from PDF and DOCX files.
 ## Usage
 
 The API provides endpoints to extract text from uploaded PDF and DOCX files. Here’s how to use it:   
-   - Open a web browser to `http://localhost:8000/docs`.
+   - Open a web browser to `http://localhost:8001/docs`.
 
    - On the Swagger UI page, select `/extract-text/` endpoint.
 

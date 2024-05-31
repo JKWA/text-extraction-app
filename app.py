@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from PyPDF2 import PdfReader
 import docx
@@ -8,12 +9,60 @@ from pptx import Presentation
 from nltk.tokenize import sent_tokenize
 import re
 from tempfile import TemporaryFile
+from pydantic import BaseModel
+
 
 app = FastAPI(
     title="Text Extractor",
-    description="Extract text from files.",
+    description="Extract text from a document. "
+    "Supported file types include PDF, DOCX, PPTX, TXT, HTML, and RTF.",
     version="0.0.1",
 )
+
+
+class ExtractedTextResponse(BaseModel):
+    text: str
+
+
+class ChunkResponse(BaseModel):
+    chunks: List[str]
+
+
+@app.post(
+    "/extract-text/",
+    response_model=ExtractedTextResponse,
+    summary="Extract text from a file",
+    description="Upload a file and extract its text content.",
+)
+async def extract_text(file: UploadFile = File(...)):
+    text = await extract_text_from_file(file)
+    return {"text": text}
+
+
+@app.post(
+    "/extract-chunks/",
+    response_model=ChunkResponse,
+    summary="Extract text chunks from a file",
+    description="Upload a file, extract its text content, "
+    "and divide it into chunks based on the specified number of "
+    "sentences per chunk and overlap.",
+)
+async def extract_chunk(
+    file: UploadFile = File(...), sentences_per_chunk: int = 5, overlap: int = 0
+):
+    text = await extract_text_from_file(file)
+
+    if not text.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="The uploaded file is empty or not readable.",
+        )
+
+    try:
+        chunks = chunk_text_by_sentences(text, sentences_per_chunk, overlap)
+        return {"chunks": chunks}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 def extract_text_from_pdf(file):
@@ -109,28 +158,3 @@ def chunk_text_by_sentences(
         i += sentences_per_chunk - overlap
 
     return chunks
-
-
-@app.post("/extract-text/")
-async def extract_text(file: UploadFile = File(...)):
-    text = await extract_text_from_file(file)
-    return {"text": text}
-
-
-@app.post("/extract-chunks/")
-async def extract_chunk(
-    file: UploadFile = File(...), sentences_per_chunk: int = 5, overlap: int = 0
-):
-    text = await extract_text_from_file(file)
-
-    if not text.strip():
-        raise HTTPException(
-            status_code=400,
-            detail="The uploaded file is empty or not readable.",
-        )
-
-    try:
-        chunks = chunk_text_by_sentences(text, sentences_per_chunk, overlap)
-        return {"chunks": chunks}
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
