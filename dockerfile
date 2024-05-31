@@ -9,6 +9,9 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Download NLTK data
+RUN python -m nltk.downloader punkt
+
 # Copy the local code to the container's working directory.
 COPY . .
 

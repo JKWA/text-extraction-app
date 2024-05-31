@@ -7,6 +7,7 @@ import pypandoc
 from pptx import Presentation
 from nltk.tokenize import sent_tokenize
 import re
+from tempfile import TemporaryFile
 
 app = FastAPI(
     title="Text Extractor",
@@ -30,13 +31,16 @@ def extract_text_from_docx(file):
 
 
 def extract_text_from_pptx(file):
-    prs = Presentation(file)
-    text = ""
-    for slide in prs.slides:
-        for shape in slide.shapes:
-            if hasattr(shape, "text"):
-                text += shape.text + "\n"
-    return text
+    with TemporaryFile() as tmp_file:
+        tmp_file.write(file.read())
+        tmp_file.seek(0)
+        prs = Presentation(tmp_file)
+        text = ""
+        for slide in prs.slides:
+            for shape in slide.shapes:
+                if hasattr(shape, "text"):
+                    text += shape.text + "\n"
+        return text
 
 
 def extract_text_from_txt(file):
