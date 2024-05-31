@@ -36,4 +36,3 @@ jobs:
       - name: Verify the Image
         run: |
           echo "The Docker image has been built and pushed to GHCR!"
-          # Provides a confirmation message that the image has been pushed.
