@@ -10,7 +10,9 @@ from nltk.tokenize import sent_tokenize
 import re
 from tempfile import TemporaryFile
 from pydantic import BaseModel
+import logging
 
+logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(
     title="Text Extractor",
@@ -96,8 +98,8 @@ def extract_text_from_txt(file):
     return file.read().decode("utf-8")
 
 
-def extract_text_from_html(file):
-    soup = BeautifulSoup(file.read(), "html.parser")
+def extract_text_from_html(content):
+    soup = BeautifulSoup(content, "html.parser")
     return soup.get_text()
 
 
@@ -108,6 +110,10 @@ def extract_text_from_rtf(file):
 
 async def extract_text_from_file(file: UploadFile) -> str:
     file_extension = os.path.splitext(file.filename)[-1].lower()
+
+    logging.info(
+        f"Extracting text from file: {file.filename} with extension: {file_extension}"
+    )
 
     if file_extension == ".pdf":
         return extract_text_from_pdf(file.file)
